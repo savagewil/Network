@@ -1,6 +1,15 @@
 import subprocess
 processes = []
 count = 1
-processes.append(subprocess.Popen("tracert 129.21.1." + str(count % 255 + 1), stdin = subprocess.PIPE, stdout = subprocess.PIPE))
+numberOfProcesses = 4
+for p in range(0, numberOfProcesses):
+    processes.append(subprocess.Popen("tracert 129.21.1." + str(count % 255 + 1), stdin = subprocess.PIPE, stdout = subprocess.PIPE))
+    count += 1
 while count < 256:
-    print processes[0].__dict__
+    for p in range(0, len(processes)):
+        if not processes[p].poll() == None:
+            print processes[p].stdout.read()
+            processes[p] = processes.append(subprocess.Popen("tracert 129.21.1." + str(count % 255 + 1), stdin = subprocess.PIPE, stdout = subprocess.PIPE))
+            count += 1
+for process in processes:
+    print process.stdout.read()
