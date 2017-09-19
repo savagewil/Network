@@ -1,4 +1,4 @@
-import subprocess
+import subprocess, sys
 processes = []
 count = 0
 numberOfProcesses = 10
@@ -14,17 +14,29 @@ def generate_IP(count):
         STRING = "." + str(count % (End_Octaves[i] - Start_Octaves[i] + 1) + Start_Octaves[i]) + STRING
         count = count // (End_Octaves[i] - Start_Octaves[i] + 1)
     return STRING[1:]
-
+def testOS():
+    if not sys.platform == "win32":
+        return 1
+    else:
+        raise OSError(1, "Operating System is not yet supported")
 def findMyIP():
-    pass
+    if testOS() == 1:
+        return [subprocess.Popen("ping -n " + str(numberOfPings) + " " + generate_IP(count),
+                                     stdin=subprocess.PIPE, stdout=subprocess.PIPE), generate_IP(count)]
 
+    processes.append([subprocess.Popen("ping -n " + str(numberOfPings) + " " + generate_IP(count),
+                                       stdin=subprocess.PIPE, stdout=subprocess.PIPE), generate_IP(count)])
+
+def createProcess(count):
+    if testOS() == 1:
+        return [subprocess.Popen("ping -n " + str(numberOfPings) + " " + generate_IP(count),
+                                 stdin=subprocess.PIPE, stdout=subprocess.PIPE), generate_IP(count)]
 count = 0
 
 
 while count < numberOfProcesses:
     try:
-        processes.append([subprocess.Popen("ping -n "+ str(numberOfPings) + " " + generate_IP(count),
-                                          stdin = subprocess.PIPE, stdout = subprocess.PIPE), generate_IP(count)])
+        processes.append(createProcess(count))
         if TestProcesses:
             numberOfProcesses += 1
             count += 1
@@ -42,9 +54,7 @@ while count < (End_Octaves[0] - Start_Octaves[0] + 1) * (End_Octaves[1] - Start_
             text = processes[p][0].stdout.read()
             IPs[processes[p][1]] = (text.count("Request timed out.") != numberOfPings)
             processes[p][0] = None
-            processes[p] = [subprocess.Popen("ping -n "+ str(numberOfPings) +" " + generate_IP(count),
-                                            stdin = subprocess.PIPE, stdout = subprocess.PIPE),\
-                           generate_IP(count)]
+            processes[p] = createProcess(count)
             count += 1
 
 print "======================"
