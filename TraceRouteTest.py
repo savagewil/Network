@@ -23,14 +23,12 @@ def generateIP(count):
 
 
 def testOS():
-    """
-    Tests the Operating System
-    :return: 1 if Windows 2 if Linux, and saddness if you are on a mac
-    """
-    if not sys.platform == "win32":
+    if sys.platform == "win32":
         return 1
+    elif sys.platform == "linux2":
+        return 2
     else:
-        raise OSError(1, "Operating System is not yet supported")
+        raise OSError(1, "Operating System sucks")
 
 
 def findMyIP():
@@ -50,13 +48,18 @@ def findMyIP():
 
         return [subprocess.Popen("ping -n " + str(numberOfPings) + " " + generateIP(count),
                                  stdin=subprocess.PIPE, stdout=subprocess.PIPE), generateIP(count)]
-
+    elif testOS() == 2:
+        args = ["ip", "-4", "route","get", "8.8.8.8", "|", "awk","{'print $7'}", "|" , "tr", "-d", "'\n'"]
+        return subprocess.check_output(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
 
 def createProcess(count):
     if testOS() == 1:
         return [subprocess.Popen("ping -n " + str(numberOfPings) + " " + generateIP(count),
                                  stdin=subprocess.PIPE, stdout=subprocess.PIPE), generateIP(count)]
+    elif testOS() == 2:
+        args = ["ping", "-c", str(numberOfPings), generateIP(count)]
+        return [subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE), generateIP(count)]
 
 def getCountOfPosibleIPs():
     return (End_Octaves[0] - Start_Octaves[0] + 1) * (End_Octaves[1] - Start_Octaves[1] + 1) * (
