@@ -9,8 +9,12 @@ IPs = {}
 Start_Octaves = [129, 21, 1, 1]
 End_Octaves = [129, 21, 255, 255]
 
-
 def generateIP(count):
+    """
+    Generates and IP using Modulus
+    :param count: The current count
+    :return: an IP
+    """
     STRING = ""
     for i in range(3, -1, -1):
         STRING = "." + str(count % (End_Octaves[i] - Start_Octaves[i] + 1) + Start_Octaves[i]) + STRING
@@ -19,6 +23,10 @@ def generateIP(count):
 
 
 def testOS():
+    """
+    Tests the Operating System
+    :return: 1 if Windows 2 if Linux, and saddness if you are on a mac
+    """
     if not sys.platform == "win32":
         return 1
     else:
@@ -26,12 +34,23 @@ def testOS():
 
 
 def findMyIP():
+    """
+    :return: The IP of the current system
+    """
     if testOS() == 1:
+        p = subprocess.Popen("ipconfig", stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        text = p.stdout.read()
+        lines = text.split("\n")
+        lines = filter(lambda line:"IPv4 Address" in line, lines)
+        if len(lines) >= 1:
+            line = lines[0]
+        else:
+            raise EnvironmentError(1, "Not On Wifi")
+
+
         return [subprocess.Popen("ping -n " + str(numberOfPings) + " " + generateIP(count),
                                  stdin=subprocess.PIPE, stdout=subprocess.PIPE), generateIP(count)]
 
-    processes.append([subprocess.Popen("ping -n " + str(numberOfPings) + " " + generateIP(count),
-                                       stdin=subprocess.PIPE, stdout=subprocess.PIPE), generateIP(count)])
 
 
 def createProcess(count):
