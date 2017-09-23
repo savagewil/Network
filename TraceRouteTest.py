@@ -5,6 +5,7 @@ count = 0
 numberOfProcesses = 10
 TestProcesses = False
 numberOfPings = 1
+pingTimeout = 1
 IPs = {}
 Start_Octaves = [129, 21, 1, 1]
 End_Octaves = [129, 21, 255, 255]
@@ -58,7 +59,7 @@ def createProcess(count):
         return [subprocess.Popen("ping -n " + str(numberOfPings) + " " + generateIP(count),
                                  stdin=subprocess.PIPE, stdout=subprocess.PIPE), generateIP(count)]
     elif testOS() == 2:
-        args = ["ping", "-c", str(numberOfPings), generateIP(count)]
+        args = ["ping", "-c", str(numberOfPings),"-W", str(pingTimeout), generateIP(count)]
         return [subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE), generateIP(count)]
 
 def getCountOfPosibleIPs():
@@ -87,7 +88,7 @@ try:
                 print processes[p][1]
                 text = processes[p][0].stdout.read()
                 IPs[processes[p][1]] = (text.count("Request timed out.") != numberOfPings)
-                processes[p][0].kill()
+                processes[p][0].wait()
                 processes[p][0] = None
                 processes[p] = createProcess(count)
                 count += 1
@@ -105,4 +106,5 @@ try:
 
 finally:
     for p in processes:
-        p[0].kill()
+        if p[0].poll() != None:
+            p[0].wait()
