@@ -3,7 +3,7 @@ import subprocess, sys
 processes = []
 count = 0
 numberOfProcesses = 10
-TestProcesses = True
+TestProcesses = False
 numberOfPings = 1
 IPs = {}
 Start_Octaves = [129, 21, 1, 1]
@@ -65,39 +65,44 @@ def getCountOfPosibleIPs():
     return (End_Octaves[0] - Start_Octaves[0] + 1) * (End_Octaves[1] - Start_Octaves[1] + 1) * (
         End_Octaves[2] - Start_Octaves[2] + 1) * (End_Octaves[3] - Start_Octaves[3] + 1)
 
+try:
+    count = 0
 
-count = 0
-
-while count < numberOfProcesses:
-    try:
-        processes.append(createProcess(count))
-        if TestProcesses:
-            numberOfProcesses += 1
+    while count < numberOfProcesses:
+        try:
+            processes.append(createProcess(count))
+            if TestProcesses:
+                numberOfProcesses += 1
             count += 1
-    except Exception:
-        TestProcesses = False
-        numberOfProcesses = count
-print numberOfProcesses
+        except Exception as e:
+            print e
+            TestProcesses = False
+            numberOfProcesses = count
+    print numberOfProcesses
 
-print "Possible IPs:",getCountOfPosibleIPs()
-while count < getCountOfPosibleIPs():
-    for p in range(0, len(processes)):
-        if not processes[p][0].poll() == None:
-            # print processes[p][1]
-            text = processes[p][0].stdout.read()
-            IPs[processes[p][1]] = (text.count("Request timed out.") != numberOfPings)
-            processes[p][0] = None
-            processes[p] = createProcess(count)
-            count += 1
+    print "Possible IPs:", getCountOfPosibleIPs()
+    while count < getCountOfPosibleIPs():
+        for p in range(0, len(processes)):
+            if not processes[p][0].poll() == None:
+                print processes[p][1]
+                text = processes[p][0].stdout.read()
+                IPs[processes[p][1]] = (text.count("Request timed out.") != numberOfPings)
+                processes[p][0].kill()
+                processes[p][0] = None
+                processes[p] = createProcess(count)
+                count += 1
 
 
-for process in processes:
-    text = process[0].stdout.read()
-    IPs[process[1]] = (text.count("Request timed out.") != numberOfPings)
-print "======================"
-FILE = open("IPs.txt", "w")
-for IP in IPs:
-    if IPs[IP]:
-        print IP
-        FILE.write(IP + "\n")
+    for process in processes:
+        text = process[0].stdout.read()
+        IPs[process[1]] = (text.count("Request timed out.") != numberOfPings)
+    print "======================"
+    FILE = open("IPs.txt", "w")
+    for IP in IPs:
+        if IPs[IP]:
+            print IP
+            FILE.write(IP + "\n")
 
+finally:
+    for p in processes:
+        p[0].kill()
