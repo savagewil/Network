@@ -32,9 +32,9 @@ try:
             numberOfProcesses = count
     print TraceRouteTest.numberOfProcesses
 
-    while count < TraceRouteTest.getNumberOfIPsInFile()-1:
+    while count < TraceRouteTest.getNumberOfIPsInFile():
         for p in range(0, len(processes)):
-            if not processes[p][0].poll() == None:
+            if (not processes[p][0].poll() == None) and (count < TraceRouteTest.getNumberOfIPsInFile()):
                 #print processes[p][1]
                 text = processes[p][0].stdout.read()
                 iplist = parseTraceRouteText(text)
@@ -45,9 +45,17 @@ try:
                     adj_mat[secondIpN][firstIpN] = 1
                 processes[p][0].wait()
                 processes[p][0] = None
+                print count
+                print TraceRouteTest.getNumberOfIPsInFile()
                 processes[p] = TraceRouteTest.createTracerouteProcess(count)
                 count += 1
-    print adj_mat
+    adj_mat_file = open("adj-mat.csv", "w")
+    for row in adj_mat:
+        for i in range(0, len(row)):
+            adj_mat_file.write(str(row[i]))
+            if i != len(row) - 1:
+                adj_mat_file.write(", ")
+        adj_mat_file.write("\n")
 finally:
     for p in processes:
         if(p[0] != None):

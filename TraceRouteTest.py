@@ -2,7 +2,7 @@ import subprocess, sys
 
 processes = []
 count = 0
-numberOfProcesses = 255
+numberOfProcesses = 500
 TestProcesses = False
 numberOfPings = 1
 pingTimeout = 1
@@ -77,8 +77,7 @@ def getNthIPFromFile(n, filename = "IPs.txt"):
 def getNumberOfIPsInFile(filename = "IPs.txt"):
     count = 0
     with open(filename) as f:
-        for l in f:
-            count += 1
+        count = len(f.readlines())
     return count
 
 def getIPPositionFromFile(ip,filename = "IPs.txt"):
@@ -133,7 +132,7 @@ try:
         if IPs[IP]:
             print IP
             FILE.write(IP + "\n")
-
+    FILE.close()
 finally:
     for p in processes:
         p[0].wait()
