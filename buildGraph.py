@@ -2,10 +2,12 @@ import TraceRouteTest #build IPs file and give us access to traceroute method
 import numpy
 
 processes = []
+TestProcesses = False
+
 
 def parseTraceRouteText(text):
     if(TraceRouteTest.testOS() == 2):
-        lines = text.splitnewlines()
+        lines = text.splitlines()
         IPs = []
         for i in range (1, len(lines)):
             tokens = lines[i].split(' ')
@@ -28,12 +30,12 @@ try:
             print e
             TestProcesses = False
             numberOfProcesses = count
-    print numberOfProcesses
+    print TraceRouteTest.numberOfProcesses
 
-    while count < TraceRouteTest.getNumberOfIPsInFile():
+    while count < TraceRouteTest.getNumberOfIPsInFile()-1:
         for p in range(0, len(processes)):
             if not processes[p][0].poll() == None:
-                print processes[p][1]
+                #print processes[p][1]
                 text = processes[p][0].stdout.read()
                 iplist = parseTraceRouteText(text)
                 for n in range(0, len(iplist)-1):
@@ -48,4 +50,5 @@ try:
     print adj_mat
 finally:
     for p in processes:
-        p[0].wait()
+        if(p[0] != None):
+            p[0].wait()
