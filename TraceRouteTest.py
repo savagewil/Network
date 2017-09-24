@@ -2,7 +2,7 @@ import subprocess, sys
 
 processes = []
 count = 0
-numberOfProcesses = 10
+numberOfProcesses = 255
 TestProcesses = False
 numberOfPings = 1
 pingTimeout = 1
