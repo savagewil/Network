@@ -98,8 +98,7 @@ try:
 
 
     for process in processes:
-        text = process[0].stdout.read()
-        IPs[process[1]] = (text.count("Request timed out.") != numberOfPings)
+        process[0].wait()
     print "======================"
     FILE = open("IPs.txt", "w")
     for IP in IPs:
