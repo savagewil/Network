@@ -62,6 +62,34 @@ def createPingProcess(count):
         args = ["ping", "-c", str(numberOfPings),"-W", str(pingTimeout), generateIP(count)]
         return [subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE), generateIP(count)]
 
+def createTracerouteProcess(count):
+    if testOS() == 1:
+        pass #TODO
+    elif testOS() == 2:
+        args = ["traceroute", "-n" , getNthIPFromFile(count)]
+        return [subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE), getNthIPFromFile(count)]
+
+#NOTE: n is zero based
+def getNthIPFromFile(n, filename = "IPs.txt"):
+    with open(filename) as f:
+        return f.readlines()[n]
+
+def getNumberOfIPsInFile(filename = "IPs.txt"):
+    count = 0
+    with open(filename) as f:
+        for l in f:
+            count += 1
+    return count
+
+def getIPPositionFromFile(ip,filename = "IPs.txt"):
+    with open(filename) as f:
+        lines = f.readlines()
+        for i in range(0, len(lines)):
+            if lines[i] == ip:
+                return i
+        return -1
+
+
 def getCountOfPosibleIPs():
     return (End_Octaves[0] - Start_Octaves[0] + 1) * (End_Octaves[1] - Start_Octaves[1] + 1) * (
         End_Octaves[2] - Start_Octaves[2] + 1) * (End_Octaves[3] - Start_Octaves[3] + 1)
