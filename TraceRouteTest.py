@@ -2,7 +2,7 @@ import subprocess, sys
 
 processes = []
 count = 0
-numberOfProcesses = 500
+numberOfProcesses = 100
 TestProcesses = False
 numberOfPings = 1
 pingTimeout = 1
@@ -135,4 +135,5 @@ try:
     FILE.close()
 finally:
     for p in processes:
-        p[0].wait()
+        if p[0] != None:
+            p[0].wait()
