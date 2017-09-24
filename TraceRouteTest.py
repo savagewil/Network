@@ -54,7 +54,7 @@ def findMyIP():
         return subprocess.check_output(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
 
-def createProcess(count):
+def createPingProcess(count):
     if testOS() == 1:
         return [subprocess.Popen("ping -n " + str(numberOfPings) + " " + generateIP(count),
                                  stdin=subprocess.PIPE, stdout=subprocess.PIPE), generateIP(count)]
@@ -71,7 +71,7 @@ try:
 
     while count < numberOfProcesses:
         try:
-            processes.append(createProcess(count))
+            processes.append(createPingProcess(count))
             if TestProcesses:
                 numberOfProcesses += 1
             count += 1
@@ -93,7 +93,7 @@ try:
                     IPs[processes[p][1]] = (text.count("64 bytes from") >= 1)
                 processes[p][0].wait()
                 processes[p][0] = None
-                processes[p] = createProcess(count)
+                processes[p] = createPingProcess(count)
                 count += 1
 
 
