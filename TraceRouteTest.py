@@ -87,7 +87,10 @@ try:
             if not processes[p][0].poll() == None:
                 print processes[p][1]
                 text = processes[p][0].stdout.read()
-                IPs[processes[p][1]] = (text.count("Request timed out.") != numberOfPings)
+                if(testOS() == 1):
+                    IPs[processes[p][1]] = (text.count("Request timed out.") != numberOfPings)
+                elif(testOS() == 2):
+                    IPs[processes[p][1]] = (text.count("64 bytes from") >= 1)
                 processes[p][0].wait()
                 processes[p][0] = None
                 processes[p] = createProcess(count)
@@ -106,5 +109,4 @@ try:
 
 finally:
     for p in processes:
-        if p[0].poll() != None:
-            p[0].wait()
+        p[0].wait()
