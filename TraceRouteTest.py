@@ -2,7 +2,7 @@ import subprocess, sys
 
 processes = []
 count = 0
-numberOfProcesses = 100
+numberOfProcesses = 255
 TestProcesses = False
 numberOfPings = 1
 pingTimeout = 1
@@ -60,7 +60,7 @@ def createPingProcess(count):
                                  stdin=subprocess.PIPE, stdout=subprocess.PIPE), generateIP(count)]
     elif testOS() == 2:
         args = ["ping", "-c", str(numberOfPings),"-W", str(pingTimeout), generateIP(count)]
-        return [subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE), generateIP(count)]
+        return [subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.PIPE), generateIP(count)]
 
 def createTracerouteProcess(count):
     if testOS() == 1:
@@ -93,9 +93,16 @@ def getCountOfPosibleIPs():
     return (End_Octaves[0] - Start_Octaves[0] + 1) * (End_Octaves[1] - Start_Octaves[1] + 1) * (
         End_Octaves[2] - Start_Octaves[2] + 1) * (End_Octaves[3] - Start_Octaves[3] + 1)
 
+def printStatusBar(totalProgress, currentProgress, statusBarLength):
+    sys.stdout.write('\b' * (statusBarLength + 4 + len(str(currentProgress)) + len(str(totalProgress))))
+    sys.stdout.flush()
+    numberOfEquals = int((float(currentProgress)/totalProgress) * statusBarLength)
+    sys.stdout.write('[' + ('=' * numberOfEquals) + (' ' * (statusBarLength - numberOfEquals)) + '] ' + str(currentProgress) + '/' + str(totalProgress))
+    sys.stdout.flush()
+
+
 try:
     count = 0
-
     while count < numberOfProcesses:
         try:
             processes.append(createPingProcess(count))
@@ -109,10 +116,11 @@ try:
     print numberOfProcesses
 
     print "Possible IPs:", getCountOfPosibleIPs()
+    print "Scanning IPs..."
     while count < getCountOfPosibleIPs():
+        printStatusBar(getCountOfPosibleIPs(), count, 40)
         for p in range(0, len(processes)):
             if not processes[p][0].poll() == None:
-                print processes[p][1]
                 text = processes[p][0].stdout.read()
                 if(testOS() == 1):
                     IPs[processes[p][1]] = (text.count("Request timed out.") != numberOfPings)
@@ -126,11 +134,11 @@ try:
 
     for process in processes:
         process[0].wait()
-    print "======================"
+    #print "======================"
     FILE = open("IPs.txt", "w")
     for IP in IPs:
         if IPs[IP]:
-            print IP
+            #print IP
             FILE.write(IP + "\n")
     FILE.close()
 finally:
