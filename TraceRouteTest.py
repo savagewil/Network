@@ -1,8 +1,9 @@
 import subprocess, sys
+import re
 
 processes = []
 count = 0
-numberOfProcesses = 255
+numberOfProcesses = 500
 TestProcesses = False
 numberOfPings = 1
 pingTimeout = 1
@@ -50,8 +51,10 @@ def findMyIP():
         return [subprocess.Popen("ping -n " + str(numberOfPings) + " " + generateIP(count),
                                  stdin=subprocess.PIPE, stdout=subprocess.PIPE), generateIP(count)]
     elif testOS() == 2:
-        args = ["ip", "-4", "route","get", "8.8.8.8", "|", "awk","{'print $7'}", "|" , "tr", "-d", "'\n'"]
-        return subprocess.check_output(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        args1 = ['awk', '"{print $NF;exit}"']
+        args2 = ["ip", "-4", "route","get", "1"]
+        myIP = re.findall('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}',subprocess.check_output(args1, stdin=subprocess.Popen(args2, stdout=subprocess.PIPE).stdout))[2]
+        return myIP
 
 
 def createPingProcess(count):
@@ -84,7 +87,7 @@ def getIPPositionFromFile(ip,filename = "IPs.txt"):
     with open(filename) as f:
         lines = f.readlines()
         for i in range(0, len(lines)):
-            if lines[i] == ip:
+            if lines[i] == str(ip) + '\n':
                 return i
         return -1
 
@@ -110,7 +113,7 @@ try:
                 numberOfProcesses += 1
             count += 1
         except Exception as e:
-            print e
+            #print e
             TestProcesses = False
             numberOfProcesses = count
     print numberOfProcesses
