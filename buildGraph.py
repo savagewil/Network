@@ -69,6 +69,7 @@ try:
             adj_mat_file.write(str(adj_mat[j][i]))
             if i != len(row) - 1:
                 adj_mat_file.write(", ")
+            adj_mat_file.flush()
         adj_mat_file.write("\n")
 finally:
     for p in processes:
