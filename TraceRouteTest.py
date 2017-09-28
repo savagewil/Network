@@ -48,6 +48,7 @@ def findMyIP():
             raise EnvironmentError(1, "Not On Wifi")
 
 
+
         return [subprocess.Popen("ping -n " + str(numberOfPings) + " " + generateIP(count),
                                  stdin=subprocess.PIPE, stdout=subprocess.PIPE), generateIP(count)]
     elif testOS() == 2:
