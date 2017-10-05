@@ -1,4 +1,5 @@
-import networkx, numpy, matplotlib
+import networkx, numpy
+import matplotlib.pyplot as pylt
 def clean(FILE,NEWFILE, count):
     print count
     NEWFILE.write(FILE.readline().replace("0.00.0", "0.0"))
@@ -9,26 +10,22 @@ def test(x):
         print x
 
 # int("CRASH")
-PATH = "C:\Users\William\Google Drive\school\College\Intro to Place and Space\NetworkMapper\\adj-mat.csv"
+PATHNEW = "C:\Users\Savage\Google Drive\school\College\Exploration of Place and space CSV\\adj-matCleaned.csv"
 
-# FILE = open(PATH, "r")
-# FILENEW = open(PATHNEW,"w")
-# FILE = open(PATH,"r")
 
 FILENEW = open(PATHNEW,"r")
-# FILENEW2 = open(PATHNEW2,"w")
+
 count = 0
 matrixArray = []
 IPsArray = []
 print count
 for line in FILENEW:
-    if line == 0:
-        IPsArray = matrixArray.append(line.split(",")[1:])
+    if count == 0:
+        IPsArray = line.split(",")[1:]
     # line = FILENEW.readline()
     print count
-    count += 1
     if 1 < count <= 12391:
-        matrixArray.append(line.split(",")[1:])
+        matrixArray.append([int(float(i)) for i in line.split(",")[1:]])
 
 
 # for row in matrixArray:
@@ -36,12 +33,15 @@ for line in FILENEW:
 #         print num,
 #     print
 graph = networkx.graph.Graph()
+print "IPS", len(IPsArray)
 for IP in IPsArray:
     graph.add_node(IP)
 for i in range(0, len(matrixArray)):
+    # print"LENGTH", len(matrixArray[i])
     for ii in range(0, len(matrixArray[i])):
+        # print i,ii
         if matrixArray[i][ii] == 1:
             graph.add_edge(IPsArray[i], IPsArray[ii])
 
-matplotlib.subplot(121)
+pylt.plot()
 networkx.draw(graph)
