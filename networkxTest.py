@@ -1,22 +1,42 @@
-print "4"
-import networkx.classes.graph as g
-import networkx.drawing as d
-print "3"
+import networkx, random
 import matplotlib.pyplot as pylt
-print "2"
-# array = .split()
-print "1"
-graph = g.Graph()
-path = "Book.txt"
-for line in open(path):
-    line = line[:-1]
-    for l in line:
-        if not l in graph:
-            graph.add_node(l)
-    for i in range(0, len(line)):
-        if i > 0:
-            graph.add_edge(line[i], line[i - 1])
+graph = networkx.graph.Graph()
+numberNodes = 10 #int(raw_input("Number of nodes:"))
+numberEdges = 20 #int(raw_input("Number of edges:"))
+
+ArrayNodes = []
+ArrayConnections = {}
+
+for number in range(0, numberNodes):
+    graph.add_node(str(number))
+    ArrayNodes.append(str(number))
+    ArrayConnections[str(number)] = [str(number)]
+    
+
+for edge in range(0,numberEdges):
+    
+    if len(ArrayConnections[ArrayNodes[0]]) == len(ArrayNodes):
+        n1 = random.randint(0,len(ArrayNodes) - 1)
+        ArrayNodes2 = ArrayNodes[:n1] + ArrayNodes[n1 + 1:]
+        n2 = random.randint(0,len(ArrayNodes2) - 1)
+        graph.add_edge(ArrayNodes2[n2], ArrayNodes[n1])
+        
+    else:
+        n1 = random.randint(0,len(ArrayNodes) - 1)
+        print ArrayConnections[ArrayNodes[n1]]
+        ArrayNodes2 = filter(lambda num:not num in ArrayConnections[ArrayNodes[n1]], ArrayNodes)
+        print ArrayNodes2
+        n2 = random.randint(0,len(ArrayNodes2) - 1)
+        temp = ArrayConnections[ArrayNodes[n1]][:]
+        temp2 = ArrayConnections[ArrayNodes2[n2]][:]
+        for let in temp:
+            ArrayConnections[let].extend(temp2)
+        for let in temp2:
+            ArrayConnections[let].extend(temp)
+        graph.add_edge(ArrayNodes2[n2], ArrayNodes[n1])
+        print ArrayConnections
+##        raw_input()
+    
 pylt.plot()
-print "test"
-d.draw(graph)
+networkx.draw(graph)
 pylt.show()
